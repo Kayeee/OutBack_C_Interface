@@ -21,10 +21,10 @@ class register:
         #TODO check error handling to check if register read fails.
         return out
 
-    def write_reg(self, value, ip, port=""):
+    def write_reg(self, ip, value, port=""):
         result = subprocess.Popen(["./program", "-w", "-c", str(ip), "-f", str(self.field), "-b", str(self.block), "-v", str(value)], stdout=subprocess.PIPE)
         out, err = result.communicate()
-        logger.info("Output " + str(out) +  " error " + str(err))
+        logger.info("Kevin Output " + str(out) +  " Kevin  error " + str(err))
         #TODO check error handling to check if register write fails.
         return out
 
