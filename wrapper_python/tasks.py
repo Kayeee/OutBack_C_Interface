@@ -5,15 +5,65 @@ from kombu import Queue
 import subprocess
 import random
 import os
+import socket
+import fcntl
+import struct
+import json
+import requests
+import time
 
 #os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'HEMS.scripts.settings')
 
-app = Celery('interface_worker', backend='amqp', broker='amqp://jessica:ASUi3dea@10.143.239.255/pi_env')
+with open('/home/pi/HEMS/webserver/HEMSapp/system.json', 'r') as json_data:
+    d = json.load(json_data)
+    print(d["system"]["box_id"])
+    parameters = d["system"]
 
-CELERY_DEFAULT_QUEUE = 'interface'
-CELERY_QUEUES = (Queue('interface', routing_key='interface'),
-    Queue('updater', routing_key='updater'),
-    Queue('outback', routing_key='outback'),)
+
+import socket
+import fcntl
+import struct
+
+def get_ip_address(ifname):
+    s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+    return socket.inet_ntoa(fcntl.ioctl(
+        s.fileno(),
+        0x8915,  # SIOCGIFADDR
+        struct.pack('256s', ifname[:15])
+    )[20:24])
+
+print(get_ip_address('wlan0'))
+parameters['local_ip'] = get_ip_address('wlan0')
+
+master_isOn = False
+rank = "slave"
+results = {}
+
+while rank == "slave" and not master_isOn:
+    #THIS MUST BE THE SERVER IP \/
+    r = requests.get('http://54.218.78.164:8000/wakeup', params=parameters)
+    results = r.json()
+    rank = results["rank"]
+    master_isOn = results["master_isOn"]
+    print("here")
+    time.sleep(2)
+
+if rank == "slave":
+    master_ip = results["master_local_ip"]
+    app = Celery('interface_worker', backend='amqp', broker='amqp://Kevin:ASUi3dea@{0}/pi_env'.format(master_ip))
+ #   CELERY_DEFAULT_QUEUE =str(parameters['box_id'])
+#    CELERY_QUEUES = (Queue(str(parameters['box_id']), routing_key=str(parameters['box_id'])))
+ 
+if rank == "master":
+    slaves = []
+    for slave_id in results["slaves"]:
+        slaves.append(Queue(str(slave_id), routing_key=str(slave_id)))
+#    CELERY_QUEUES = tuple(slaves)
+
+#CELERY_DEFAULT_QUEUE = 'interface'
+#CELERY_QUEUES = (Queue('interface', routing_key='interface'),
+#    Queue('updater', routing_key='updater'),
+#    Queue('outback', routing_key='outback'),)
 
 @app.task(name='add')
 def add(x, y):

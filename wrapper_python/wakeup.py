@@ -25,25 +25,6 @@ logger.info('Here')
 
 logging.basicConfig(filename='../logs/wakeup.log', level=logging.DEBUG)
 
-with open('system.json', 'r') as json_data:
-    d = json.load(json_data)
-    print(d["system"]["box_id"])
-    parameters = d["system"]
-   
-import socket
-import fcntl
-import struct
-
-def get_ip_address(ifname):
-    s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-    return socket.inet_ntoa(fcntl.ioctl(
-        s.fileno(),
-        0x8915,  # SIOCGIFADDR
-        struct.pack('256s', ifname[:15])
-    )[20:24])
-
-print(get_ip_address('wlan0'))
-parameters['local_ip'] = get_ip_address('wlan0')
-r = requests.get('http://192.168.0.101:8000/wakeup', params=parameters)
-print(r.json())
-
+from tasks import app, parameters 
+argv = ['worker', '-A', 'tasks', '-l', 'info', '-Q', parameters['box_id']]
+app.worker_main(argv)
