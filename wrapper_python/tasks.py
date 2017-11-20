@@ -14,7 +14,7 @@ import time
 
 #os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'HEMS.scripts.settings')
 
-with open('/home/pi/HEMS/webserver/HEMSapp/system.json', 'r') as json_data:
+with open('/home/pi/HEMS/project/wrapper_python/system.json', 'r') as json_data:
     d = json.load(json_data)
     print(d["system"]["box_id"])
     parameters = d["system"]
@@ -35,20 +35,19 @@ def get_ip_address(ifname):
 print(get_ip_address('wlan0'))
 parameters['local_ip'] = get_ip_address('wlan0')
 
-master_isOn = False
-rank = "slave"
 results = {}
 
-while rank == "slave" and not master_isOn:
-    #THIS MUST BE THE SERVER IP \/
-    r = requests.get('http://54.218.78.164:8000/wakeup', params=parameters)
-    results = r.json()
-    rank = results["rank"]
-    master_isOn = results["master_isOn"]
-    print("here")
-    time.sleep(2)
-
+r = requests.get('http://192.168.0.101:8000/wakeup', params=parameters)
+results = r.json()
+print(results)
+rank = results["rank"]
 if rank == "slave":
+    master_isOn = results["master_isOn"]
+    while not master_isOn:
+        time.sleep(2)
+        results = requets.get('http://192.168.0.101:8000/wakeup', params=parameters)
+        master_isOn = results["master_isOn"]
+
     master_ip = results["master_local_ip"]
     app = Celery('interface_worker', backend='amqp', broker='amqp://Kevin:ASUi3dea@{0}/pi_env'.format(master_ip))
  #   CELERY_DEFAULT_QUEUE =str(parameters['box_id'])
@@ -58,6 +57,7 @@ if rank == "master":
     slaves = []
     for slave_id in results["slaves"]:
         slaves.append(Queue(str(slave_id), routing_key=str(slave_id)))
+    app = Celery('interface_worker', backend='amqp', broker='amqp://Kevin:ASUi3dea@192.168.0.101/pi_env')
 #    CELERY_QUEUES = tuple(slaves)
 
 #CELERY_DEFAULT_QUEUE = 'interface'
