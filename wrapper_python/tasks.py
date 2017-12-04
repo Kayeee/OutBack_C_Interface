@@ -37,7 +37,7 @@ parameters['local_ip'] = get_ip_address('wlan0')
 
 results = {}
 
-r = requests.get('http://192.168.0.101:8000/wakeup', params=parameters)
+r = requests.get('http://192.168.0.102:8000/hems/wakeup', params=parameters)
 results = r.json()
 print(results)
 rank = results["rank"]
@@ -45,8 +45,9 @@ if rank == "slave":
     master_isOn = results["master_isOn"]
     while not master_isOn:
         time.sleep(2)
-        results = requets.get('http://192.168.0.101:8000/wakeup', params=parameters)
-        master_isOn = results["master_isOn"]
+        results = requests.get('http://192.168.0.102:8000/hems/wakeup', params=parameters)
+        master_isOn = results.json()["master_isOn"]
+        print("waiting for master")
 
     master_ip = results["master_local_ip"]
     app = Celery('interface_worker', backend='amqp', broker='amqp://Kevin:ASUi3dea@{0}/pi_env'.format(master_ip))
@@ -57,7 +58,7 @@ if rank == "master":
     slaves = []
     for slave_id in results["slaves"]:
         slaves.append(Queue(str(slave_id), routing_key=str(slave_id)))
-    app = Celery('interface_worker', backend='amqp', broker='amqp://Kevin:ASUi3dea@192.168.0.101/pi_env')
+    app = Celery('interface_worker', backend='amqp', broker='amqp://Kevin:ASUi3dea@192.168.0.102/pi_env')
 #    CELERY_QUEUES = tuple(slaves)
 
 #CELERY_DEFAULT_QUEUE = 'interface'
