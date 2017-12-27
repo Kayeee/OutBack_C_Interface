@@ -9,9 +9,9 @@ def check_in():
         d = json.load(json_data)
         params = d['system']
 
-    r = requests.get('http://192.168.0.102:8000/hems/checkIn', params=params)
+    r = requests.get('http://172.20.10.5:8000/hems/checkIn', params=params)
     print(r.text) 
-
+  
 def main():
     scheduler = BlockingScheduler()
     scheduler.add_job(check_in, 'interval', seconds=4)
