@@ -1,6 +1,7 @@
 
 from celery import Celery
 from kombu import Queue
+from celery.result import allow_join_result
 
 import subprocess
 import random
@@ -66,9 +67,16 @@ if rank == "master":
 #    Queue('updater', routing_key='updater'),
 #    Queue('outback', routing_key='outback'),)
 
+import tasks_transition as trans
 @app.task(name='add')
 def add(x, y):
-    return x + y
+    r = trans.add.apply_async(args=[x,y], queue='2', routing_key='2')
+    while not r.ready():
+        print('waiting for result from slave')
+        time.sleep(1)
+    
+    with allow_join_result():
+        return r.get()
 
 def create_celery_queue(queue_name):
     CELERY_QUEUES.append(Queue(queue_name, routing_key=queue_name))
