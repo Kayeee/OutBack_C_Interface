@@ -110,3 +110,30 @@ def getAll(inverter_id):
 
     print("inverter id: {0}").format(inverter_id)
     return {"inverter_id": inverter_id}
+
+@app.task(name='runCommand')
+def run_command(x, y):
+    result = subprocess.Popen(['python','test1.py', str(x), str(y)], stdin=subprocess.PIPE, stdout=subprocess.PIPE)
+    out, err = result.communicate()
+    if result.returncode != 0:
+        print('stderr: [%s]' % err)
+        print('stderr: [%s]' % out)
+    return out
+
+@app.task(name='readValue')
+def readValue(device_name):
+    result = subprocess.Popen(['python','read_outback.py', device_name], stdin=subprocess.PIPE, stdout=subprocess.PIPE)
+    out, err = result.communicate()
+    if result.returncode != 0:
+        print('stderr: [%s]' % err)
+        print('stderr: [%s]' % out)
+    return out
+
+@app.task(name='writeValue')
+def writeValue(device_name, value):
+    result = subprocess.Popen(['python','write_outback.py', device_name, value], stdin=subprocess.PIPE, stdout=subprocess.PIPE)
+    out, err = result.communicate()
+    if result.returncode != 0:
+        print('stderr: [%s]' % err)
+        print('stderr: [%s]' % out)
+    return out
