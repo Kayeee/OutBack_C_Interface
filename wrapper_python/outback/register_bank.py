@@ -63,12 +63,14 @@ register_bank = {
         "OutBack_Enable_FNDC_Charge_Termination" : register("OutBack_Enable_FNDC_Charge_Termination",47, OUTBACK_BLOCK),
         "OutBack_Enable_FNDC_Grid_Tie_Control" : register("OutBack_Enable_FNDC_Grid_Tie_Control",48, OUTBACK_BLOCK),
 
+        "OutBack_AGS_Mode" : register("OutBack_AGS_Mode",51, OUTBACK_BLOCK),
+
         "OutBack_Error" : register("OutBack_Error",154, OUTBACK_BLOCK),
         "OutBack_Status" : register("OutBack_Status",155, OUTBACK_BLOCK),
         "OutBack_System_Voltage" : register("OutBack_System_Voltage",158, OUTBACK_BLOCK),
         "OutBack_Measured_System_Voltage" : register("OutBack_Measured_System_Voltage",159, OUTBACK_BLOCK),
 
-           "CCconfig_Absorb_Volts" : register("CCconfig_Absorb_Volts",109, FMCHARGE_CONTROLLER_BLOCK, "Volts" ),
+        "CCconfig_Absorb_Volts" : register("CCconfig_Absorb_Volts",240, FMCHARGE_CONTROLLER_BLOCK, "Volts" ),
         "CCconfig_Absorb_Time_Hours" : register("CCconfig_Absorb_Time_Hours",241, FMCHARGE_CONTROLLER_BLOCK, "hours" ),
         "CCconfig_Absorb_End_Amps" : register("CCconfig_Absorb_End_Amps",242, FMCHARGE_CONTROLLER_BLOCK, "Amperes" ),
         "CCconfig_Rebulk_Volts" : register("CCconfig_Rebulk_Volts",243, FMCHARGE_CONTROLLER_BLOCK, "Volts" ),

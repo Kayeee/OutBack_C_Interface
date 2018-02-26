@@ -1,7 +1,5 @@
-import sys
+import signal
 
-def stringify_xy(x,y):
-    return x+y
+def handler(signum, frame):
+    print "Signal handler called with signal", signum
 
-if __name__=="__main__":
-    print(str(stringify_xy(sys.argv[1], sys.argv[2])))
