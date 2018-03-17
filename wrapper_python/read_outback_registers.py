@@ -20,7 +20,7 @@ def record_data(result, register, pi_id, record_time, index):
         config = json.loads(open('records.json').read())
         json_len = len(config)
         # Update data
-        if index == 0:
+        if index == 1:
             data = {'interval_records': [
                 {'register_name': register, 'value': result, 'date_time': record_time, 'pi_id': pi_id}
             ]}
@@ -30,13 +30,15 @@ def record_data(result, register, pi_id, record_time, index):
             config[json_len-1]['interval_records'].append(data)
         # Write all data back to file
         with open('records.json', 'w') as json_data:
-            json_data.write(json.dumps(config))
+            #json_data.write(json.dumps(config))
+            #json_data.write("\n")
+            json.dump(config, json_data, indent=2)
     else:
         data = [{'interval_records': [
                 {'register_name': register, 'value': result, 'date_time': record_time, 'pi_id': pi_id}
                 ]}]
         with open('/home/pi/HEMS/project/wrapper_python/records.json', 'w') as outfile:
-            json.dump(data, outfile)
+            json.dump(data, outfile, indent=2)
 
 
 def clear_text(read_result):
@@ -54,19 +56,20 @@ def progress(register_list):
 
     inv = InverterFactory.InverterFactory().factory()
     # Process each register by passing its values to local memory and database
-    for index in range(len(register_list)):
+    for index in range(1,len(register_list)):
         register = register_list[index]
         read_result = str(inv.read(register))
+        print(read_result)
         result = clear_text(read_result)
+        print(result)
         record_time = datetime.datetime.now().isoformat()
         record_data(result, register, pi_id, record_time, index)
         # Send data to Database via server
-        params = send_data(result, register, pi_id, record_time)
-        r = requests.get('http://asuleaps.com/hems/recordValue', params)
-        print(r.text)
+        #params = send_data(result, register, pi_id, record_time)
+        #r = requests.get('http://asuleaps.com/hems/recordValue', params)
+        #print(r.text)
 
 
 if __name__ == '__main__':
     # A register list assigned by task
-    register_list = sys.argv[1]
-    progress(register_list)
+    progress(sys.argv)
