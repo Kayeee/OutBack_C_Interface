@@ -60,6 +60,12 @@ if rank == "master":
         slaves.append(Queue(str(slave_id), routing_key=str(slave_id)))
     app = Celery('interface_worker', backend='amqp', broker='amqp://Kevin:ASUi3dea@asuleaps.com/pi_env')
 
+
+#import schedule_check
+# Perform schedule check on local raspberry pi and store data
+#schedule_check.performScheduledTasks()
+
+
 import tasks_transition as trans
 @app.task(name='add')
 def add(x, y):

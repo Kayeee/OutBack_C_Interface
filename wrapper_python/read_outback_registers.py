@@ -65,9 +65,9 @@ def progress(register_list):
         record_time = datetime.datetime.now().isoformat()
         record_data(result, register, pi_id, record_time, index)
         # Send data to Database via server
-        #params = send_data(result, register, pi_id, record_time)
-        #r = requests.get('http://asuleaps.com/hems/recordValue', params)
-        #print(r.text)
+        params = send_data(result, register, pi_id, record_time)
+        r = requests.get('http://asuleaps.com/hems/recordValue', params)
+        print(r.text)
 
 
 if __name__ == '__main__':
