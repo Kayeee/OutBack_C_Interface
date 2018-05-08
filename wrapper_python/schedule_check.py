@@ -6,7 +6,9 @@ import subprocess
 
 
 # Global variable
-register_list = ['OutBack_Minute']
+register_list = ['OutBack_Day','OutBack_Hour','OutBack_Minute','OutBack_Second','CC_Batt_Voltage',
+                 'CC_Lifetime_kWH_Hours','CCconfig_Log_Daily_Max_Input_Volts','OutBack_Measured_System_Voltage',
+                 'I_AC_Frequency','I_AC_Energy_WH','GS_Single_Battery_Temperature','GS_Single_Sell_Status','GS_Single_Load_kW']
 write_values = ['3']
 queue = '1'
 
@@ -36,7 +38,7 @@ def call_read_task():
 def performScheduledTasks():
     scheduler = BlockingScheduler()
     scheduler.add_job(call_read_task, 'interval', minutes=5)
-    scheduler.add_job(call_write_task, 'interval', minutes=15)
+    #scheduler.add_job(call_write_task, 'interval', minutes=15)
     scheduler.start()
 
 if __name__=='__main__':
